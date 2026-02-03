@@ -1,0 +1,29 @@
+/* src/index.css */
+
+/*
+  Este reset garante que os elementos principais (html, body e o #root do React)
+  ocupem 100% da tela e não tenham margens ou paddings inesperados.
+  Isso cria uma base sólida para o nosso layout.
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Impede barras de rolagem na página principal */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Garante que o box-sizing seja consistente em todos os elementos */
+*, *::before, *::after {
+  box-sizing: border-box;
+}

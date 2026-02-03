@@ -1,0 +1,539 @@
+
+
+
+/* src/App.css */
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+/* Modifique a classe app-container */
+.app-container {
+  display: grid;
+  /* Define a Sidebar na esquerda e o resto à direita */
+  grid-template-columns: 80px 1fr; 
+  grid-template-rows: 60px 1fr; /* Define a Top Toolbar no topo */
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+:root {
+  --sidebar-bg: #1a202c;       /* Azul escuro profissional */
+  --sidebar-hover: #2d3748;    /* Azul um pouco mais claro para hover */
+  --sidebar-active: #3182ce;   /* Azul destaque para o item selecionado */
+  --icon-color: #a0aec0;       /* Cor suave para ícones não selecionados */
+  --danger-soft: #c53030;      /* Vermelho menos "aceso" */
+}
+
+.sidebar {
+  grid-row: 1 / 3;
+  grid-column: 1;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid #10141d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 12px;
+  z-index: 10;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+}
+
+.content-container {
+  display: grid;
+  /* Divide o espaço restante: 70% para o editor e 30% para o código */
+  grid-template-columns: 70% 30%; 
+  flex-grow: 1; /* Ocupa todo o espaço que a Toolbar não usar */
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Ajuste a Toolbar para não sumir e ter uma largura definida */
+.toolbar {
+  width: 280px; /* Largura fixa para a barra lateral */
+  background-color: #ffffff;
+  padding: 15px;
+  border-right: 2px solid #ddd;
+  display: flex;
+  flex-direction: column; /* Itens um abaixo do outro */
+  gap: 15px;
+  height: 100vh;
+  overflow-y: auto; /* Permite rolar se houver muitos botões */
+  flex-shrink: 0;   /* Impede que a barra seja esmagada */
+}
+
+.content-container {
+  grid-row: 2;
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: 70% 30%;
+  height: 100%;
+  overflow: hidden;
+}
+.sidebar button {
+  width: 50px; /* Reduzi um pouco para ficar mais elegante */
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border-radius: 12px; /* Bordas mais arredondadas */
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #475569; /* Cor do ícone */
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Tooltip simples ou indicação de hover */
+.sidebar button:hover {
+  background-color: var(--sidebar-hover);
+  color: #ffffff;
+}
+
+/* Estilo para quando o botão for o tipo selecionado */
+.sidebar button.active {
+  background-color: var(--sidebar-active);
+  color: white;
+  box-shadow: 0 0 15px rgba(49, 130, 206, 0.4);
+}
+
+/* Divisor elegante */
+.sidebar hr {
+  width: 30px;
+  border: 0;
+  border-top: 1px solid #2d3748;
+  margin: 10px 0;
+}
+
+/* Botão de limpar (Vermelho profissional/discreto) */
+.sidebar button.clear-button {
+  margin-top: auto; /* Empurra para o final da barra */
+  color: #fc8181;
+}
+
+.sidebar button.clear-button:hover {
+  background-color: var(--danger-soft) !important;
+  color: white !important;
+}
+
+.clear-button:hover {
+  background-color: #fee2e2 !important;
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+/* Garante que o ícone dentro do botão não quebre layout */
+.sidebar button svg {
+  flex-shrink: 0;
+}
+
+
+.top-toolbar {
+  grid-row: 1;
+  grid-column: 2;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 20px;
+  position: relative; 
+  z-index: 1000; /* Garante que fique acima do editor */
+}
+
+.manual-input {
+  /* Garante que o input aceite cliques */
+  pointer-events: auto !important;
+  cursor: text !important;
+}
+
+.editor-pane {
+  background-color: #e9e9e9;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
+
+.label-boundary {
+  background-color: #ffffff;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.code-pane {
+  background-color: #0f172a; /* Slate 900 */
+  border-left: 1px solid #1e293b;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%; /* Ocupa 100% da altura do pai */
+  box-sizing: border-box;
+  overflow: hidden; /* Impede scroll na div principal */
+}
+
+/* 1. Importação: Tamanho fixo menor, pois é apenas entrada */
+.import-section {
+  flex: 0 0 20%; /* Ocupa fixo 20% da altura disponível */
+}
+
+/* 2. ZPL Output: Tamanho flexível */
+.output-section {
+  flex: 1; /* Ocupa o espaço restante igualmente */
+}
+
+/* 3. ADVPL Output: Tamanho flexível (se quiser que o ADVPL seja maior, aumente o flex-grow) */
+.output-section.flex-grow {
+  flex: 1.2; /* ADVPL ganha um pouco mais de espaço que o ZPL */
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between; /* Joga o título pra esq e botão pra dir */
+  align-items: center;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #1e293b;
+}
+
+.section-header h2 {
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-header h2 svg {
+  color: #64748b; /* Ícone do título um pouco mais apagado */
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+/* Botão Primário (Gerar ZPL) - Verde profissional */
+.action-button.primary {
+  background-color: #10b981; /* Emerald 500 */
+  color: #ffffff;
+}
+.action-button.primary:hover {
+  background-color: #059669; /* Emerald 600 */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Botão Secundário (Importar) - Azul profissional */
+.action-button.secondary {
+  background-color: #3b82f6; /* Blue 500 */
+  color: #ffffff;
+}
+.action-button.secondary:hover {
+  background-color: #2563eb; /* Blue 600 */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.textarea-wrapper {
+  flex: 1; /* Preenche toda a altura da seção pai */
+  position: relative;
+  min-height: 0; /* Crucial para scroll funcionar dentro */
+}
+
+.pane-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0; /* MÁGICA: Permite que o flex item encolha se necessário */
+}
+
+.code-pane h2 {
+  color: #f1f5f9;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zpl-import-section {
+  flex: 0 0 160px; /* Fixa uma altura para não ocupar muito espaço */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.zpl-generation-section, 
+.advpl-generation-section {
+  flex: 1; /* Ocupa o restante do espaço (50% do que sobrou cada um) */
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Crucial para o scroll funcionar dentro do flex item */
+}
+
+
+.code-pane textarea {
+  width: 100%;
+  height: 100%;
+  background-color: #1e293b !important; /* Slate 800 */
+  color: #a5b4fc !important; /* Indigo 200 (cor de código suave) */
+  border: 1px solid #334155 !important;
+  border-radius: 6px !important;
+  padding: 12px !important;
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace !important;
+  font-size: 11px !important;
+  line-height: 1.5;
+  resize: none; /* Remove resize manual */
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.code-pane textarea:focus {
+  border-color: #6366f1 !important; /* Indigo 500 foco */
+  background-color: #1b2537 !important;
+}
+
+.element {
+  position: absolute;
+  cursor: move;
+  padding: 0;
+  border: 1px dashed transparent;
+  min-width: 20px;
+  user-select: none;
+  font-family: sans-serif;
+  line-height: 1;
+  display: inline-block;
+  font-weight: bold; /* ADICIONADO: Deixa o texto do elemento em negrito */
+}
+
+.element:hover { border-color: #007bff; }
+.element.dragging {
+  border-color: #007bff; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000;
+}
+.element:focus {
+  cursor: text; border-color: #28a745; border-style: solid;
+}
+
+.element.selected {
+  border-style: solid;
+  border-color: #007bff;
+}
+
+.element-input {
+  position: absolute;
+  padding: 2px 5px;
+  border: 1px solid #007bff;
+  z-index: 1001;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  font-weight: bold; /* ADICIONADO: Deixa o texto em negrito durante a edição */
+}
+
+.line-container {
+  position: absolute;
+  /* Isso é crucial: permite clicar através das partes vazias do quadrado da linha */
+  pointer-events: none; 
+}
+
+/* Reabilita o clique apenas nas linhas SVG desenhadas (a invisível e a visível) */
+.line-container svg line {
+  pointer-events: stroke;
+}
+.line-element { stroke: #333; stroke-width: 2; }
+.line-handle {
+  width: 10px;  /* Tamanho reduzido (era provavelmente maior ou padrão div) */
+  height: 10px;
+  background-color: #3b82f6; /* Azul */
+  border: 1px solid white;
+  border-radius: 50%;
+  position: absolute;
+  /* O segredo para centralizar exatamente na ponta: */
+  transform: translate(-50%, -50%); 
+  cursor: pointer;
+  z-index: 1002;
+  box-shadow: 0 0 3px rgba(0,0,0,0.3);
+}
+
+.line-handle:hover {
+  transform: translate(-50%, -50%) scale(1.2); /* Efeito ao passar o mouse */
+  background-color: #2563eb;
+}
+
+.line-body {
+    /* Garante que o corpo não atrapalhe o clique nas pontas */
+    pointer-events: auto; 
+}
+
+.line-handle:active { cursor: grabbing; }
+.square-element { position: absolute; border: 2px solid #333; cursor: move; box-sizing: border-box; }
+.square-element:hover { border-color: #007bff; }
+.resize-handle { position: absolute; width: 14px; height: 14px; background-color: white; border: 2px solid #007bff; right: -8px; bottom: -8px; cursor: nwse-resize; z-index: 1003; }
+
+.snap-line {
+  position: absolute;
+  background-color: #ff4d4d;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.snap-line.vertical {
+  width: 1px;
+  top: 0;
+  height: 100%;
+}
+
+.snap-line.horizontal {
+  height: 1px;
+  left: 0;
+  width: 100%;
+}
+
+.qrcode-element {
+  position: absolute;
+  cursor: move;
+  padding: 5px;
+  background-color: white;
+  border: 1px dashed transparent;
+  box-sizing: border-box;
+}
+
+.qrcode-element:hover {
+  border-color: #007bff;
+}
+
+.qrcode-element.selected {
+  border-style: solid;
+  border-color: #007bff;
+  box-shadow: 0 0 0 1px white, 0 0 0 2px #007bff;
+}
+
+.qrcode-element .resize-handle {
+  z-index: 1004;
+}
+
+/* Adicione estas classes ao final do seu src/App.css */
+
+.code-pane {
+  /* Altera o display para flex e permite que as seções internas cresçam */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.zpl-import-section, 
+.zpl-generation-section,
+.advpl-generation-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* CRUCIAL: permite que a div encolha corretamente no Flexbox */
+  gap: 8px;
+}
+
+.zpl-import-section {
+  flex: 0 0 30%; 
+}
+
+/* 2. ZPL Gerado (30%) */
+.zpl-generation-section {
+  flex: 0 0 30%;
+}
+
+/* 3. ADVPL Gerado (40%) */
+.advpl-generation-section {
+  flex: 0 0 40%;
+}
+
+.zpl-import-section textarea {
+  height: 100px; /* Altura fixa para o campo de importação */
+  resize: vertical;
+  margin-bottom: 10px;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #3c3c3c;
+  border-radius: 4px;
+  padding: 10px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+
+/* src/App.css */
+
+.code-pane {
+  background-color: #0f172a; /* Azul quase preto, mais moderno que o cinza */
+  padding: 24px;
+  border-left: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.code-pane h2 {
+  color: #f1f5f9;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zpl-import-section, .zpl-generation-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/*teste*/
+
+
+.zpl-import-section button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  align-self: flex-end; 
+  transition: background-color 0.2s;
+}
+
+.zpl-import-section button:hover {
+  background-color: #2563eb;
+}
+
+.code-pane textarea::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.code-pane textarea::-webkit-scrollbar-track {
+  background: transparent; 
+}
+.code-pane textarea::-webkit-scrollbar-thumb {
+  background: #475569; 
+  border-radius: 3px;
+}
+.code-pane textarea::-webkit-scrollbar-thumb:hover {
+  background: #64748b; 
+}
